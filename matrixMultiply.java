@@ -51,15 +51,13 @@ class matrixMultiply{
                 pend = System.nanoTime();
                 ptime=(pend-pstart)/1000000000;
 
-		        System.out.println("Serial time taken for size n = "+n+" is : " + stime + " Seconds");
+		        System.out.println("Times taken for matrix of size n = "+n+" is : Serial= " + stime + " Parallel= "+ ptime);
                 stotal = stotal + stime;
-		        System.out.println("Paralel time taken for size n = "+n+" is : " + ptime + " Seconds");
                 ptotal = ptotal + ptime;
             }
             stimes[k]=stotal/10;
-	        System.out.println("Average serial time for size n = "+n+" is : "+ stimes[k] + " Seconds");
             ptimes[k]=ptotal/10;
-	        System.out.println("Average serial time for size n = "+n+" is : "+ ptimes[k] + " Seconds");
+	        System.out.println("Average times for matrix of size n = "+n+" is : Serial= "+ stimes[k] + " Parallel= "+ ptimes[k]);
             n=n*2;
             stotal=0;
             ptotal=0;
@@ -78,14 +76,12 @@ class matrixMultiply{
   		return c;
     }
 
-public static int[][] strassen(int[][]a, int[][]b)
-	{
+    public static int[][] strassen(int[][]a, int[][]b){
 		int n = a.length;
 		int[][] R = new int[n][n];
 		if(n==1)
 			R[0][0] = a[0][0]*b[0][0];
-		else if(n<=64)
-		{
+		else if(n<=64){
 			int[][] a11 = new int[n/2][n/2];
 			int[][] a12 = new int[n/2][n/2];
 			int[][] a21 = new int[n/2][n/2];
@@ -105,28 +101,23 @@ public static int[][] strassen(int[][]a, int[][]b)
 			split(b,b22,n/2,n/2);
 
 			int [][] M1 = strassen(add(a11, a22), add(b11, b22));
-           		int [][] M2 = strassen(add(a21, a22), b11);
-            		int [][] M3 = strassen(a11, sub(b12, b22));
-            		int [][] M4 = strassen(a22, sub(b21, b11));
-            		int [][] M5 = strassen(add(a11, a12), b22);
-            		int [][] M6 = strassen(sub(a21, a11), add(b11, b12));
-            		int [][] M7 = strassen(sub(a12, a22), add(b21, b22));
+       		int [][] M2 = strassen(add(a21, a22), b11);
+    		int [][] M3 = strassen(a11, sub(b12, b22));
+    		int [][] M4 = strassen(a22, sub(b21, b11));
+    		int [][] M5 = strassen(add(a11, a12), b22);
+    		int [][] M6 = strassen(sub(a21, a11), add(b11, b12));
+    		int [][] M7 = strassen(sub(a12, a22), add(b21, b22));
 
 			int [][] C11 = add(sub(add(M1, M4), M5), M7);
-            		int [][] C12 = add(M3, M5);
-            		int [][] C21 = add(M2, M4);
-            		int [][] C22 = add(sub(add(M1, M3), M2), M6);
+    		int [][] C12 = add(M3, M5);
+    		int [][] C21 = add(M2, M4);
+    		int [][] C22 = add(sub(add(M1, M3), M2), M6);
 
 			join(C11, R, 0 , 0);
-            		join(C12, R, 0 , n/2);
-            		join(C21, R, n/2, 0);
-            		join(C22, R, n/2, n/2);
-
-
-		}
-
-		else
-		{
+    		join(C12, R, 0 , n/2);
+    		join(C21, R, n/2, 0);
+    		join(C22, R, n/2, n/2);
+		}else{
 			int[][] a11 = new int[n/2][n/2];
 			int[][] a12 = new int[n/2][n/2];
 			int[][] a21 = new int[n/2][n/2];
@@ -136,60 +127,34 @@ public static int[][] strassen(int[][]a, int[][]b)
 			int[][] b21 = new int[n/2][n/2];
 			int[][] b22 = new int[n/2][n/2];
 
-			class Mul implements Runnable
-			{
+			class Mul implements Runnable{
 				private Thread t;
 				private String threadName;
-				Mul(String name)
-				{
+				Mul(String name){
 					threadName=name;
 				}
-				public void run()
-				{
-					if(threadName.equals("thread1"))
-					{
+				public void run(){
+					if(threadName.equals("thread1")){
 						split(a,a11,0,0);
-					}
-					else if(threadName.equals("thread2"))
-					{
+					}else if(threadName.equals("thread2")){
 						 split(a,a12,0,n/2);
-					}
-
-					else if(threadName.equals("thread3"))
-					{
+					}else if(threadName.equals("thread3")){
 						  split(a,a21,n/2,0);
-					}
-
-					else if(threadName.equals("thread4"))
-					{
+					}else if(threadName.equals("thread4")){
 						split(a,a22,n/2,n/2);
-					}
-
-					else if(threadName.equals("thread5"))
-					{
+					}else if(threadName.equals("thread5")){
 						split(b,b11,0,0);
-					}
-
-					else if(threadName.equals("thread6"))
-					{
+					}else if(threadName.equals("thread6")){
 						 split(b,b12,0,n/2);
-					}
-
-					else if(threadName.equals("thread7"))
-					{
+					}else if(threadName.equals("thread7")){
 						split(b,b21,n/2,0);
-					}
-
-					else if(threadName.equals("thread8"))
-					{
+					}else if(threadName.equals("thread8")){
 						split(b,b22,n/2,n/2);
 					}
 				}
 
-				public void start()
-				{
-					if(t==null)
-					{
+				public void start(){
+					if(t==null){
 						t=new Thread(this,"Thread1");
 						t.start();
 					}
@@ -211,69 +176,50 @@ public static int[][] strassen(int[][]a, int[][]b)
 			m7.start();
 			Mul m8=new Mul("thread8");
 			m8.start();
-			for (Thread t : new Thread[] { m1.t,m2.t,m3.t,m4.t,m5.t,m6.t,m7.t,m8.t })
-			{
-				try
-				{
+			for (Thread t : new Thread[] { m1.t,m2.t,m3.t,m4.t,m5.t,m6.t,m7.t,m8.t }){
+				try{
 					t.join();
-				}
-				catch(Exception e)
-				{
+				}catch(Exception e){
 					System.out.println(e);
 				}
 			}
 
 
 			int [][] M1 = strassen(add(a11, a22), add(b11, b22));
-           		int [][] M2 = strassen(add(a21, a22), b11);
-            		int [][] M3 = strassen(a11, sub(b12, b22));
-            		int [][] M4 = strassen(a22, sub(b21, b11));
-            		int [][] M5 = strassen(add(a11, a12), b22);
-            		int [][] M6 = strassen(sub(a21, a11), add(b11, b12));
-            		int [][] M7 = strassen(sub(a12, a22), add(b21, b22));
+       		int [][] M2 = strassen(add(a21, a22), b11);
+    		int [][] M3 = strassen(a11, sub(b12, b22));
+    		int [][] M4 = strassen(a22, sub(b21, b11));
+    		int [][] M5 = strassen(add(a11, a12), b22);
+    		int [][] M6 = strassen(sub(a21, a11), add(b11, b12));
+    		int [][] M7 = strassen(sub(a12, a22), add(b21, b22));
 
 			int [][] C11 = add(sub(add(M1, M4), M5), M7);
-            		int [][] C12 = add(M3, M5);
-            		int [][] C21 = add(M2, M4);
-            		int [][] C22 = add(sub(add(M1, M3), M2), M6);
+    		int [][] C12 = add(M3, M5);
+    		int [][] C21 = add(M2, M4);
+    		int [][] C22 = add(sub(add(M1, M3), M2), M6);
 
-			class Mul2 implements Runnable
-			{
+			class Mul2 implements Runnable{
 				private Thread t;
 				private String threadName;
-				Mul2(String name)
-				{
+				Mul2(String name){
 					threadName=name;
 				}
 
-				public void run()
-				{
-					if(threadName.equals("thread1"))
-					{
+				public void run(){
+					if(threadName.equals("thread1")){
 						join(C11, R, 0 , 0);
-					}
-					else if(threadName.equals("thread2"))
-					{
+					}else if(threadName.equals("thread2")){
 						 join(C12, R, 0 , n/2);
-					}
-
-					else if(threadName.equals("thread3"))
-					{
+					}else if(threadName.equals("thread3")){
 						 join(C21, R, n/2, 0);
-
-					}
-
-					else if(threadName.equals("thread4"))
-					{
+					}else if(threadName.equals("thread4")){
 						 join(C22, R, n/2, n/2);
 					}
 
 				}
 
-				public void start()
-				{
-					if(t==null)
-					{
+				public void start(){
+					if(t==null){
 						t=new Thread(this,"Thread1");
 						t.start();
 					}
@@ -287,14 +233,10 @@ public static int[][] strassen(int[][]a, int[][]b)
 			m33.start();
 			Mul2 m44=new Mul2("thread4");
 			m44.start();
-			for (Thread t : new Thread[] { m11.t,m22.t,m33.t,m44.t })
-			{
-				try
-				{
+			for (Thread t : new Thread[] { m11.t,m22.t,m33.t,m44.t }){
+				try{
 					t.join();
-				}
-				catch(Exception e)
-				{
+				}catch(Exception e){
 					System.out.println(e);
 				}
 			}
@@ -302,14 +244,11 @@ public static int[][] strassen(int[][]a, int[][]b)
 		return R;
 	}
 
-public static void split(int[][]P,int[][]C,int iB,int jB)
-	{
+    public static void split(int[][]P,int[][]C,int iB,int jB){
 		int i2 = iB;
-		for(int i1=0;i1< C.length;i1++)
-		{
+		for(int i1=0;i1< C.length;i1++){
 			int j2 = jB;
-			for(int j1=0; j1<C.length;j1++)
-			{
+			for(int j1=0; j1<C.length;j1++){
 				C[i1][j1] = P[i2][j2];
 				j2++;
 			}
@@ -317,41 +256,34 @@ public static void split(int[][]P,int[][]C,int iB,int jB)
 		}
 	}
 
-public static int[][] add(int[][] a,int[][] b)
-	{
+    public static int[][] add(int[][] a,int[][] b){
 		int n = a.length;
 		int[][] c = new int[n][n];
-		for(int i = 0;i<n;i++)
-		{
+		for(int i = 0;i<n;i++){
 			for(int j=0;j<n;j++)
 				c[i][j] = a[i][j] + b[i][j];
 		}
 	return c;
 	}
 
-public static int[][] sub(int[][] a,int[][] b)
-	{
+    public static int[][] sub(int[][] a,int[][] b){
 		int n = a.length;
 		int[][] c = new int[n][n];
-		for(int i = 0;i<n;i++)
-		{
+		for(int i = 0;i<n;i++){
 			for(int j=0;j<n;j++)
 				c[i][j] = a[i][j] - b[i][j];
 		}
 	return c;
 	}
-public static void join(int[][]P,int[][]C,int iB,int jB)
-	{
+    public static void join(int[][]P,int[][]C,int iB,int jB){
 		int i2 = iB;
-		for(int i1=0;i1< P.length;i1++)
-		{
+		for(int i1=0;i1< P.length;i1++){
 			int j2 = jB;
-			for(int j1=0; j1< P.length;j1++)
-			{
+			for(int j1=0; j1< P.length;j1++){
 				C[i2][j2] = P[i1][j1];
 				j2++;
 			}
 			i2++;
 		}
-}
+    }
 }
